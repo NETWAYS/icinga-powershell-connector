@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/NETWAYS/go-check"
 	log "github.com/sirupsen/logrus"
+	flag "github.com/spf13/pflag"
 	"os"
 )
 
@@ -25,8 +27,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 `
 
 func main() {
-	config, err := ParseConfigFromFlags()
+	config, err := ParseConfigFromFlags(os.Args[1:])
 	if err != nil {
+		if errors.Is(err, ErrVersionRequested) || errors.Is(err, flag.ErrHelp) {
+			os.Exit(check.Unknown)
+		}
+
 		check.ExitError(err)
 	}
 

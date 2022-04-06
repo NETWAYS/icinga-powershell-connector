@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"errors"
 	"fmt"
 	flag "github.com/spf13/pflag"
 	"net/http"
@@ -24,31 +25,57 @@ type Config struct {
 	PrintVersion bool
 }
 
-func ParseConfigFromFlags() (config *Config, err error) {
-	config = &Config{}
+var (
+	// ErrVersionRequested returned when --version flag is set
+	ErrVersionRequested = errors.New("version was requested by a flag")
 
-	flag.StringVar(&config.Command, "command", "", "Command to be executed")
-	flag.StringVar(&config.API, "api", DefaultAPI, "API Endpoint")
-	flag.StringVar(&config.CertName, "cert-name", GetIcingaNodeName(), "Certificate Name to be expected")
-	flag.StringVar(&config.CAFile, "ca-file", IcingaCAPath, "Icinga CA file to be loaded")
-	flag.BoolVar(&config.Insecure, "insecure", false, "Ignore any certificate checks")
-	flag.BoolVar(&config.Debug, "debug", false, "Enable debug logging")
-	flag.BoolVar(&config.PrintVersion, "version", false, "Print program version")
+	// ErrNoCommand is returned when no PowerShell command could be parsed from flags.
+	ErrNoCommand = errors.New("no command found for PowerShell execution")
+)
 
-	flag.CommandLine.SortFlags = false
-	flag.CommandLine.ParseErrorsWhitelist.UnknownFlags = true
+func NewConfig() *Config {
+	return &Config{
+		API:      DefaultAPI,
+		CertName: GetIcingaNodeName(),
+		CAFile:   IcingaCAPath,
+	}
+}
 
-	flag.Parse()
+// BuildFlags for a passed flag.FlagSet to store values inside Config.
+func (c *Config) BuildFlags(fs *flag.FlagSet) {
+	fs.StringVar(&c.Command, "command", c.Command, "Command to be executed")
+	fs.StringVar(&c.API, "api", c.API, "API Endpoint")
+	fs.StringVar(&c.CertName, "cert-name", c.CertName, "Certificate Name to be expected")
+	fs.StringVar(&c.CAFile, "ca-file", c.CAFile, "Icinga CA file to be loaded")
+	fs.BoolVar(&c.Insecure, "insecure", c.Insecure, "Ignore any certificate checks")
+	fs.BoolVar(&c.Debug, "debug", c.Debug, "Enable debug logging")
+	fs.BoolVar(&c.PrintVersion, "version", false, "Print program version")
+}
+
+// ParseConfigFromFlags to be called to parse CLI arguments and return the built Config struct.
+func ParseConfigFromFlags(arguments []string) (config *Config, err error) {
+	config = NewConfig()
+
+	flags, powerShellArgs := SplitPowerShellArguments(arguments)
+
+	fs := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
+	config.BuildFlags(fs)
+	fs.SortFlags = false
+
+	err = fs.Parse(flags)
+	if err != nil {
+		return nil, err
+	}
 
 	if config.PrintVersion {
 		_, _ = fmt.Fprintln(os.Stdout, ProgramName+" "+buildVersion())
 		_, _ = fmt.Fprintln(os.Stdout, License)
 
-		os.Exit(0)
+		return nil, ErrVersionRequested
 	}
 
-	// Parse Powershell flags
-	command, args := GetPowershellArgs(os.Args[1:])
+	// Parse Powershell arguments
+	command, args := GetPowershellArgs(powerShellArgs)
 	if command != "" {
 		config.Command = command
 	}
@@ -56,8 +83,29 @@ func ParseConfigFromFlags() (config *Config, err error) {
 	config.Arguments = args
 
 	if config.Command == "" {
-		err = fmt.Errorf("no command found for Powershell execution")
-		return
+		return config, ErrNoCommand
+	}
+
+	return
+}
+
+// SplitPowerShellArguments separate this commands flags from Powershell.exe arguments.
+//
+// Usually this starts shorthand flag.
+func SplitPowerShellArguments(arguments []string) (flags, powerShell []string) {
+	var isPowerShell bool
+
+	for _, arg := range arguments {
+		// Look for a shorthand argument
+		if arg[0] == '-' && arg[1] != '-' {
+			isPowerShell = true
+		}
+
+		if isPowerShell {
+			powerShell = append(powerShell, arg)
+		} else {
+			flags = append(flags, arg)
+		}
 	}
 
 	return
