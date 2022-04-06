@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/x509"
 	"encoding/json"
-	"fmt"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -35,12 +34,8 @@ func LoadIcingaCACert(path string) *x509.CertPool {
 
 	// Build pool
 	pool := x509.NewCertPool()
-	if ! pool.AppendCertsFromPEM(data) {
-		log.WithField("path", path).Debug("could not append any CA certificates to pool")
-
-		for _, b := range pool.Subjects() {
-			fmt.Println(string(b))
-		}
+	if !pool.AppendCertsFromPEM(data) {
+		log.WithField("path", path).Warning("could not append any CA certificates to pool")
 	}
 
 	return pool
