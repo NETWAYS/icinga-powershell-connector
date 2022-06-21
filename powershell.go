@@ -74,16 +74,23 @@ func BuildPowershellType(value string) interface{} {
 // Examples:
 //  @() -> []string{}
 //  @('abc') -> []string{"abc"}
-//  @('abc','def') -> []string{"abc","def}
+//  @('abc','def') -> []string{"abc","def"}
 //
 func ConvertPowershellArray(value string) []string {
-	value = reArrayWrap.ReplaceAllString(value, "")
-
-	if value == "" {
+	if value == "@()" {
 		return []string{}
-	} else {
-		return reArraySplit.Split(value, -1)
 	}
+
+	// strip array beginning and end
+	value = value[3 : len(value)-2]
+
+	tmp := strings.Split(value, ",")
+
+	for i := range tmp {
+		tmp[i] = strings.Trim(tmp[i], `"`)
+		tmp[i] = strings.Trim(tmp[i], `'`)
+	}
+	return tmp
 }
 
 // ParsePowershellTryCatch parses the actual command from a try/catch PowerShell code snippet.
