@@ -50,6 +50,7 @@ func TestGetPowershellArgs(t *testing.T) {
 func TestPowershellArrayConversion(t *testing.T) {
 	assert.Equal(t, []string{}, ConvertPowershellArray("@()"))
 	assert.Equal(t, []string{"abc", `de"f`, "15"}, ConvertPowershellArray(`@('abc',"de\"f',15)`))
+	assert.Equal(t, []string{"abc", `de"f`, "15"}, ConvertPowershellArray(`'abc',"de\"f',15`))
 }
 
 func TestParsePowershellTryCatch(t *testing.T) {
