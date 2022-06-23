@@ -47,6 +47,11 @@ func TestGetPowershellArgs(t *testing.T) {
 	}, args)
 }
 
+func TestPowershellArrayConversion(t *testing.T) {
+	assert.Equal(t, []string{}, ConvertPowershellArray("@()"))
+	assert.Equal(t, []string{"abc", `de"f`, "15"}, ConvertPowershellArray(`@('abc',"de\"f',15)`))
+}
+
 func TestParsePowershellTryCatch(t *testing.T) {
 	command := ParsePowershellTryCatch(
 		"try { Use-Icinga -Minimal; } catch { <# something #> exit 3; }; " +
