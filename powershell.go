@@ -74,6 +74,7 @@ func BuildPowershellType(value string) interface{} {
 //  @('abc') -> []string{"abc"}
 //  @('abc','def') -> []string{"abc","def"}
 //
+// nolint:funlen
 func ConvertPowershellArray(value string) []string {
 	if value == "@()" || len(value) == 0 {
 		return []string{}
@@ -98,7 +99,6 @@ func ConvertPowershellArray(value string) []string {
 	marker := 0
 
 	for i := range value {
-		//fmt.Printf("Index: %d, char: \"%s\", inside_string: %v, escaping_mode: %v,\nquote_mode: %v, marker: %d, current result: %v\n",i, string(value[i]), inside_string, escaping_mode, quote_mode, marker, result)
 		if value[i] == '"' && !escaping_mode {
 			if inside_string && quote_mode == `"` {
 				inside_string = false
@@ -107,8 +107,10 @@ func ConvertPowershellArray(value string) []string {
 				quote_mode = `"`
 				inside_string = true
 			}
+
 			continue
 		}
+
 		if value[i] == '\'' && !escaping_mode {
 			if inside_string && quote_mode == `'` {
 				inside_string = false
@@ -117,18 +119,20 @@ func ConvertPowershellArray(value string) []string {
 				quote_mode = `'`
 				inside_string = true
 			}
+
 			continue
 		}
+
 		if value[i] == ',' && !inside_string {
 			if value[i-1] == ',' {
 				// Two consecutive commas
 				result = append(result, "")
-				// Jump over the next one
 			} else {
 				result = append(result, unquoteString(value[marker:i]))
 			}
 			// Point to char after comma
 			marker = i + 1
+
 			continue
 		}
 
@@ -147,6 +151,7 @@ func ConvertPowershellArray(value string) []string {
 	if marker != len(value) {
 		result = append(result, unquoteString(value[marker:]))
 	}
+
 	return result
 }
 
@@ -160,6 +165,7 @@ func unquoteString(s string) string {
 		//fmt.Printf("Unquote string res: %s\n", s[1:len(s)-1])
 		return s[1 : len(s)-1]
 	}
+
 	return s
 }
 
@@ -201,6 +207,7 @@ func IsPowershellArray(s string) bool {
 	escaping_mode := false
 	quote_mode := ``
 	found_array_separator := false
+
 	for i := range s {
 		if string(s[i]) == `"` && !escaping_mode {
 			if inside_string && quote_mode == `"` {
@@ -210,8 +217,10 @@ func IsPowershellArray(s string) bool {
 				quote_mode = `"`
 				inside_string = true
 			}
+
 			continue
 		}
+
 		if string(s[i]) == `'` && !escaping_mode {
 			if inside_string && quote_mode == `'` {
 				inside_string = false
@@ -220,15 +229,19 @@ func IsPowershellArray(s string) bool {
 				quote_mode = `'`
 				inside_string = true
 			}
+
 			continue
 		}
+
 		if string(s[i]) == `,` && !inside_string {
 			found_array_separator = true
 		}
+
 		if escaping_mode {
 			escaping_mode = false
 			continue
 		}
 	}
+
 	return found_array_separator
 }
