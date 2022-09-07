@@ -49,16 +49,22 @@ func TestGetPowershellArgs(t *testing.T) {
 
 func TestPowershellArrayConversionEmpty(t *testing.T) {
 	assert.Equal(t, []string{}, ConvertPowershellArray("@()"))
+	assert.Equal(t, []string{}, ConvertPowershellArray(""))
 }
 
 func TestPowershellArrayTest(t *testing.T) {
 	assert.Equal(t, true, IsPowershellArray(`@('abc',"de\"f',15)`))
 	assert.Equal(t, true, IsPowershellArray(`'abc',"de\"f',15`))
+	assert.Equal(t, true, IsPowershellArray("'',''"))
+
+	assert.Equal(t, false, IsPowershellArray(`'';"de\"f';1`))
+	assert.Equal(t, false, IsPowershellArray(""))
 }
 
 func TestPowershellArrayConversion(t *testing.T) {
 	assert.Equal(t, []string{"abc", `de\"f`, "15"}, ConvertPowershellArray(`@('abc',"de\"f",15)`))
 	assert.Equal(t, []string{"abc", `de\"f`, "15"}, ConvertPowershellArray(`'abc',"de\"f",15`))
+
 	assert.Equal(t,
 		[]string{"ASFASDFASF[]}", "", "", "1523423", "1"},
 		ConvertPowershellArray(`'ASFASDFASF[]}',,"",1523423,1`))
