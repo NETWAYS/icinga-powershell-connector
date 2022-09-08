@@ -3,9 +3,9 @@ package main
 import (
 	"crypto/x509"
 	"encoding/json"
-	log "github.com/sirupsen/logrus"
-	"io/ioutil"
 	"os"
+
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -25,7 +25,7 @@ func LoadIcingaCACert(path string) *x509.CertPool {
 	}
 
 	// Load contents
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		log.WithError(err).WithField("path", path).Debug("could not read Icinga CA certificate")
 
