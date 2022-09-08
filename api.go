@@ -5,11 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type RestAPI struct {
@@ -52,7 +53,7 @@ func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}) 
 	defer resp.Body.Close()
 
 	// Read response
-	resultBody, err := ioutil.ReadAll(resp.Body)
+	resultBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("could not read result: %w", err)
 	}
