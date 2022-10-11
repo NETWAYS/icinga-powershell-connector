@@ -36,6 +36,17 @@ func GetPowershellArgs(args []string) (command string, arguments map[string]inte
 			continue
 		}
 
+		// warning and critical might be ranges
+		if strings.ToLower(arg) ==  "-warning" || strings.ToLower(arg) ==  "-critical" {
+			// No matter what happens, the next argument is a threshold value
+			// This is a dirty hack to allow the usage of range expressions which might
+			// begin with '-' (which then might be interpreted as options
+			arguments[arg] = BuildPowershellType(args[i+1])
+			i++
+			continue
+		}
+
+
 		// all other flags
 		if i+1 >= l || args[i+1][0] == '-' {
 			// next argument is also a flag, so this is a switch
