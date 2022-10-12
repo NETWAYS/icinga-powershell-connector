@@ -37,15 +37,15 @@ func GetPowershellArgs(args []string) (command string, arguments map[string]inte
 		}
 
 		// warning and critical might be ranges
-		if strings.ToLower(arg) ==  "-warning" || strings.ToLower(arg) ==  "-critical" {
+		if strings.ToLower(arg) == "-warning" || strings.ToLower(arg) == "-critical" {
 			// No matter what happens, the next argument is a threshold value
 			// This is a dirty hack to allow the usage of range expressions which might
 			// begin with '-' (which then might be interpreted as options
 			arguments[arg] = BuildPowershellType(args[i+1])
 			i++
+
 			continue
 		}
-
 
 		// all other flags
 		if i+1 >= l || args[i+1][0] == '-' {
@@ -81,9 +81,10 @@ func BuildPowershellType(value string) interface{} {
 // ConvertPowershellArray to a golang type.
 //
 // Examples:
-//  @() -> []string{}
-//  @('abc') -> []string{"abc"}
-//  @('abc','def') -> []string{"abc","def"}
+//
+//	@() -> []string{}
+//	@('abc') -> []string{"abc"}
+//	@('abc','def') -> []string{"abc","def"}
 //
 // nolint:funlen
 func ConvertPowershellArray(value string) []string {
@@ -184,11 +185,10 @@ func unquoteString(s string) string {
 //
 // Examples:
 //
-//  try { Use-Icinga -Minimal; } catch { <# something #> exit 3; };
-// 	  Exit-IcingaExecutePlugin -Command 'Invoke-IcingaCheckUsedPartitionSpace'
-//  try { Use-Icinga -Minimal; } catch { <# something #> exit 3; }; Invoke-IcingaCheckUsedPartitionSpace
-//  Invoke-IcingaCheckUsedPartitionSpace
-//
+//	 try { Use-Icinga -Minimal; } catch { <# something #> exit 3; };
+//		  Exit-IcingaExecutePlugin -Command 'Invoke-IcingaCheckUsedPartitionSpace'
+//	 try { Use-Icinga -Minimal; } catch { <# something #> exit 3; }; Invoke-IcingaCheckUsedPartitionSpace
+//	 Invoke-IcingaCheckUsedPartitionSpace
 func ParsePowershellTryCatch(command string) string {
 	command = strings.TrimSpace(command)
 
