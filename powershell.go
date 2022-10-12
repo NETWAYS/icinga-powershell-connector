@@ -41,10 +41,8 @@ func GetPowershellArgs(args []string) (command string, arguments map[string]inte
 			// next argument is also a flag, so this is a switch
 			arguments[arg] = true
 		} else {
-
 			arguments[arg] = BuildPowershellType(args[i+1])
 			i++
-
 		}
 	}
 

@@ -85,7 +85,14 @@ func TestParsePowershellTryCatch(t *testing.T) {
 }
 
 func TestPowershellQuotes(t *testing.T) {
-	command, arguments := GetPowershellArgs([]string{"-Command", "Invoke-IcingaCheckPerfCounter", "-PerfCounter", `"'\TCPv4\Connections Established'"`})
+	command, arguments := GetPowershellArgs(
+		[]string{
+			"-Command",
+			"Invoke-IcingaCheckPerfCounter",
+			"-PerfCounter",
+			`"'\TCPv4\Connections Established'"`,
+		},
+	)
 
 	assert.Equal(t, "Invoke-IcingaCheckPerfCounter", command)
 
