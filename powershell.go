@@ -63,6 +63,10 @@ func BuildPowershellType(value string) interface{} {
 	} else if IsPowershellArray(value) {
 		return ConvertPowershellArray(value)
 	} else {
+		value = strings.Trim(value, "\"")
+		if value[0] == '\'' && value[len(value)-1] == '\'' {
+			return value[1: len(value)-1]
+		}
 		return value
 	}
 }

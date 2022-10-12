@@ -83,3 +83,13 @@ func TestParsePowershellTryCatch(t *testing.T) {
 	command = ParsePowershellTryCatch("Invoke-IcingaCheckUsedPartitionSpace")
 	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
 }
+
+func TestPowershellQuotes(t *testing.T) {
+	command, arguments := GetPowershellArgs([]string{"-Command", "Invoke-IcingaCheckPerfCounter", "-PerfCounter", `"'\TCPv4\Connections Established'"`})
+
+	assert.Equal(t, "Invoke-IcingaCheckPerfCounter", command)
+	expected_args := map[string]interface{}{
+		"-PerfCounter": "\\TCPv4\\Connections Established",
+	}
+	assert.Equal(t, expected_args, arguments)
+}
