@@ -41,8 +41,10 @@ func GetPowershellArgs(args []string) (command string, arguments map[string]inte
 			// next argument is also a flag, so this is a switch
 			arguments[arg] = true
 		} else {
+
 			arguments[arg] = BuildPowershellType(args[i+1])
 			i++
+
 		}
 	}
 
@@ -65,7 +67,7 @@ func BuildPowershellType(value string) interface{} {
 	} else {
 		value = strings.Trim(value, "\"")
 		if value[0] == '\'' && value[len(value)-1] == '\'' {
-			return value[1: len(value)-1]
+			return value[1 : len(value)-1]
 		}
 		return value
 	}
@@ -74,9 +76,10 @@ func BuildPowershellType(value string) interface{} {
 // ConvertPowershellArray to a golang type.
 //
 // Examples:
-//  @() -> []string{}
-//  @('abc') -> []string{"abc"}
-//  @('abc','def') -> []string{"abc","def"}
+//
+//	@() -> []string{}
+//	@('abc') -> []string{"abc"}
+//	@('abc','def') -> []string{"abc","def"}
 //
 // nolint:funlen
 func ConvertPowershellArray(value string) []string {
@@ -177,11 +180,10 @@ func unquoteString(s string) string {
 //
 // Examples:
 //
-//  try { Use-Icinga -Minimal; } catch { <# something #> exit 3; };
-// 	  Exit-IcingaExecutePlugin -Command 'Invoke-IcingaCheckUsedPartitionSpace'
-//  try { Use-Icinga -Minimal; } catch { <# something #> exit 3; }; Invoke-IcingaCheckUsedPartitionSpace
-//  Invoke-IcingaCheckUsedPartitionSpace
-//
+//	 try { Use-Icinga -Minimal; } catch { <# something #> exit 3; };
+//		  Exit-IcingaExecutePlugin -Command 'Invoke-IcingaCheckUsedPartitionSpace'
+//	 try { Use-Icinga -Minimal; } catch { <# something #> exit 3; }; Invoke-IcingaCheckUsedPartitionSpace
+//	 Invoke-IcingaCheckUsedPartitionSpace
 func ParsePowershellTryCatch(command string) string {
 	command = strings.TrimSpace(command)
 

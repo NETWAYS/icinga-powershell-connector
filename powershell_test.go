@@ -88,8 +88,10 @@ func TestPowershellQuotes(t *testing.T) {
 	command, arguments := GetPowershellArgs([]string{"-Command", "Invoke-IcingaCheckPerfCounter", "-PerfCounter", `"'\TCPv4\Connections Established'"`})
 
 	assert.Equal(t, "Invoke-IcingaCheckPerfCounter", command)
+
 	expected_args := map[string]interface{}{
 		"-PerfCounter": "\\TCPv4\\Connections Established",
 	}
+
 	assert.Equal(t, expected_args, arguments)
 }
