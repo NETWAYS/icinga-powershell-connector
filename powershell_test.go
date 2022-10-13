@@ -102,3 +102,13 @@ func TestPowershellQuotes(t *testing.T) {
 
 	assert.Equal(t, expected_args, arguments)
 }
+
+func TestPowershellQuotes2(t *testing.T) {
+	command, arguments := GetPowershellArgs([]string{"-Command", "Invoke-IcingaCheckCPU", "-Core", `'\''_Total'\''`})
+
+	assert.Equal(t, "Invoke-IcingaCheckCPU", command)
+	expected_args := map[string]interface{}{
+		"-Core": "_Total",
+	}
+	assert.Equal(t, expected_args, arguments)
+}
