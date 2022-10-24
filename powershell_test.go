@@ -47,6 +47,12 @@ func TestGetPowershellArgs(t *testing.T) {
 	}, args)
 }
 
+func TestPowershellRangeExpression(t *testing.T) {
+	command, args := GetPowershellArgs([]string{"-C", "Invoke-IcingaCheckUsedPartitionSpace", "-Warning", "-5:80"})
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+	assert.Equal(t, map[string]interface{}{"-Warning": "-5:80"}, args)
+}
+
 func TestPowershellArrayConversionEmpty(t *testing.T) {
 	assert.Equal(t, []string{}, ConvertPowershellArray("@()"))
 	assert.Equal(t, []string{}, ConvertPowershellArray(""))
