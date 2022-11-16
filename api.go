@@ -18,7 +18,7 @@ type RestAPI struct {
 	Client *http.Client
 }
 
-func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}) (*APICheckResult, error) {
+func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, timeout uint32) (*APICheckResult, error) {
 	// Build body
 	body, err := json.Marshal(arguments)
 	if err != nil {
@@ -26,7 +26,7 @@ func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}) 
 	}
 
 	// With timeout
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	defer cancel()
 
 	// Build request
