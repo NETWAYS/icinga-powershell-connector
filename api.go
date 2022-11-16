@@ -18,7 +18,7 @@ type RestAPI struct {
 	Client *http.Client
 }
 
-func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, timeout uint32) (*APICheckResult, error) {
+func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, timeout uint32) (*APICheckResult, error) { //nolint:lll
 	// Build body
 	body, err := json.Marshal(arguments)
 	if err != nil {
