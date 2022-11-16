@@ -3,10 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/NETWAYS/go-check"
 	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
-	"os"
 )
 
 const License = `
@@ -43,7 +44,7 @@ func main() {
 
 	api := RestAPI{URL: config.API, Client: config.NewClient()}
 
-	result, err := api.ExecuteCheck(config.Command, config.Arguments)
+	result, err := api.ExecuteCheck(config.Command, config.Arguments, config.Timeout)
 	if err != nil {
 		check.ExitError(err)
 	}

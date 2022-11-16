@@ -4,9 +4,10 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	flag "github.com/spf13/pflag"
 	"net/http"
 	"os"
+
+	flag "github.com/spf13/pflag"
 )
 
 const (
@@ -15,6 +16,7 @@ const (
 )
 
 type Config struct {
+	Timeout      uint32
 	API          string
 	Command      string
 	Arguments    map[string]interface{}
@@ -50,6 +52,7 @@ func (c *Config) BuildFlags(fs *flag.FlagSet) {
 	fs.BoolVar(&c.Insecure, "insecure", c.Insecure, "Ignore any certificate checks")
 	fs.BoolVar(&c.Debug, "debug", c.Debug, "Enable debug logging")
 	fs.BoolVar(&c.PrintVersion, "version", false, "Print program version")
+	fs.Uint32Var(&c.Timeout, "timeout", 10, "Powershell connector timeout")
 }
 
 // ParseConfigFromFlags to be called to parse CLI arguments and return the built Config struct.
