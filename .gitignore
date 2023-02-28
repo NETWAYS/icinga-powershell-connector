@@ -12,3 +12,5 @@ powershell-connector*
 
 # Test files
 *.crt
+*.out
+coverage.html
