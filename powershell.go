@@ -68,15 +68,17 @@ func BuildPowershellType(value string) interface{} {
 		return false
 	} else if IsPowershellArray(value) {
 		return ConvertPowershellArray(value)
-	} else {
-		value = strings.Trim(value, "\"")
-		if len(value) >= 6 && value[0:4] == "'\\''" && value[len(value)-4:] == "'\\''" {
-			return value[4 : len(value)-4]
-		} else if value[0] == '\'' && value[len(value)-1] == '\'' {
-			return value[1 : len(value)-1]
-		}
-		return value
 	}
+
+	value = strings.Trim(value, "\"")
+
+	if len(value) >= 6 && value[0:4] == "'\\''" && value[len(value)-4:] == "'\\''" {
+		return value[4 : len(value)-4]
+	} else if value[0] == '\'' && value[len(value)-1] == '\'' {
+		return value[1 : len(value)-1]
+	}
+
+	return value
 }
 
 // ConvertPowershellArray to a golang type.
