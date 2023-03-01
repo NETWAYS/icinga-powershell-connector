@@ -1,12 +1,7 @@
 package main
 
 import (
-	"regexp"
 	"strings"
-)
-
-var (
-	reUnquoteString = regexp.MustCompile(`(^["'\s]+|["'\s]+$)`)
 )
 
 // GetPowershellArgs returns remaining args and parse them as if we were powershell.exe
@@ -192,18 +187,15 @@ func unquoteString(s string) string {
 // Examples:
 //
 //	 try { Use-Icinga -Minimal; } catch { <# something #> exit 3; };
-//		  Exit-IcingaExecutePlugin -Command 'Invoke-IcingaCheckUsedPartitionSpace'
+//			Exit-IcingaExecutePlugin -Command 'Invoke-IcingaCheckUsedPartitionSpace'
 //	 try { Use-Icinga -Minimal; } catch { <# something #> exit 3; }; Invoke-IcingaCheckUsedPartitionSpace
 //	 Invoke-IcingaCheckUsedPartitionSpace
 func ParsePowershellTryCatch(command string) string {
 	command = strings.TrimSpace(command)
-
-	// for now just parse the last word, dequote it and use it as command
+	// For now just parse the last word, dequote it and use it as command
 	parts := strings.Split(command, " ")
-	command = parts[len(parts)-1]
-	command = reUnquoteString.ReplaceAllString(command, "")
-
-	return command
+	// Trim ' " and whitespaces
+	return strings.Trim(parts[len(parts)-1], "'\" \t")
 }
 
 func IsPowershellArray(s string) bool {

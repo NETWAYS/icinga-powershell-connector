@@ -113,6 +113,24 @@ func TestParsePowershellTryCatch(t *testing.T) {
 
 	command = ParsePowershellTryCatch("Invoke-IcingaCheckUsedPartitionSpace")
 	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("   'Invoke-IcingaCheckUsedPartitionSpace'  ")
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("   'Invoke-IcingaCheckUsedPartitionSpace'  ")
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("try catch foo bar   'Invoke-IcingaCheckUsedPartitionSpace'")
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("Exit-Foo -Test \"'Invoke-IcingaCheckUsedPartitionSpace'\"")
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("")
+	assert.Equal(t, "", command)
+
+	command = ParsePowershellTryCatch("foo")
+	assert.Equal(t, "foo", command)
 }
 
 func TestPowershellQuotes(t *testing.T) {
