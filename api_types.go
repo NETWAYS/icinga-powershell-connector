@@ -16,20 +16,22 @@ type APICheckResult struct {
 	Perfdata    APIPerfdataList
 }
 
-func (r APICheckResult) String() (s string) {
-	s = strings.TrimSpace(r.CheckResult)
+func (r APICheckResult) String() string {
+	var s strings.Builder
+
+	s.WriteString(strings.TrimSpace(r.CheckResult))
 
 	if len(r.Perfdata) > 0 {
-		s += "\n|"
+		s.WriteString("\n|")
 
 		for _, p := range r.Perfdata {
-			s += " " + strings.TrimSpace(p)
+			s.WriteString(" " + strings.TrimSpace(p))
 		}
 	}
 
-	s += "\n"
+	s.WriteString("\n")
 
-	return
+	return s.String()
 }
 
 // UnmarshalJSON makes sure we can de-serialize JSON.

@@ -3,8 +3,9 @@ run:
 
 linters:
   disable-all: false
+  disable:
+    - musttag
   presets:
     - bugs
     - unused
-    # - style
   fast: false
