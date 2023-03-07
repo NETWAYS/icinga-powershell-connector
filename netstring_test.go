@@ -1,16 +1,14 @@
 package main
 
 import (
-	"github.com/stretchr/testify/assert"
-	"os"
+	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseNetstring(t *testing.T) {
-	r, err := os.Open("testdata/netstring.dat")
-	if err != nil {
-		t.Fatal(err)
-	}
+	r := strings.NewReader("1:a,5:bbbbb,11:aaaaaaaaaaa,")
 
 	data, err := ParseNetstring(r)
 	assert.NoError(t, err)
