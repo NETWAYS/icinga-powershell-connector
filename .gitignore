@@ -13,4 +13,5 @@ powershell-connector*
 # Test files
 *.crt
 *.out
+*.profile
 coverage.html

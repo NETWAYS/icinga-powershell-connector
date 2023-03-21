@@ -6,6 +6,31 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func BenchmarkGetPowershellArgs(b *testing.B) {
+	b.ReportAllocs()
+
+	for i := 0; i < b.N; i++ {
+		GetPowershellArgs([]string{
+			"--powershell-api",
+			"https://battlestation:5668",
+			"--powershell-insecure",
+			"-C",
+			"try { Use-Icinga -Minimal; } catch { <# some error #>; exit 3; }; " +
+				"Exit-IcingaExecutePlugin -Command 'Invoke-IcingaCheckUsedPartitionSpace' ",
+			"-Warning",
+			"80",
+			"-Critical",
+			"95",
+			"-Include",
+			"@()",
+			"-Exclude",
+			"@('abc','def')",
+			"-Verbosity",
+			"2",
+		})
+	}
+}
+
 func TestGetPowershellArgs(t *testing.T) {
 	command, args := GetPowershellArgs([]string{"-C", "Invoke-IcingaCheckUsedPartitionSpace", "-Warning", "80"})
 	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
@@ -88,6 +113,24 @@ func TestParsePowershellTryCatch(t *testing.T) {
 
 	command = ParsePowershellTryCatch("Invoke-IcingaCheckUsedPartitionSpace")
 	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("   'Invoke-IcingaCheckUsedPartitionSpace'  ")
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("   'Invoke-IcingaCheckUsedPartitionSpace'  ")
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("try catch foo bar   'Invoke-IcingaCheckUsedPartitionSpace'")
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("Exit-Foo -Test \"'Invoke-IcingaCheckUsedPartitionSpace'\"")
+	assert.Equal(t, "Invoke-IcingaCheckUsedPartitionSpace", command)
+
+	command = ParsePowershellTryCatch("")
+	assert.Equal(t, "", command)
+
+	command = ParsePowershellTryCatch("foo")
+	assert.Equal(t, "foo", command)
 }
 
 func TestPowershellQuotes(t *testing.T) {
