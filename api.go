@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -46,8 +47,13 @@ func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, 
 
 	// Execute request
 	resp, err := a.getClient().Do(req)
+
 	if err != nil {
-		return nil, fmt.Errorf("API request failed: %w", err)
+		// We want to override the context error message to be more expressive
+		if errors.Is(err, context.DeadlineExceeded) {
+			return nil, fmt.Errorf("timeout during HTTP request: %w", err)
+		}
+		return nil, fmt.Errorf("executing API request failed: %w", err)
 	}
 
 	defer resp.Body.Close()

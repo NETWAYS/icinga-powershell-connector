@@ -52,7 +52,7 @@ func (c *Config) BuildFlags(fs *flag.FlagSet) {
 	fs.BoolVar(&c.Insecure, "insecure", c.Insecure, "Ignore any certificate checks")
 	fs.BoolVar(&c.Debug, "debug", c.Debug, "Enable debug logging")
 	fs.BoolVar(&c.PrintVersion, "version", false, "Print program version")
-	fs.Uint32Var(&c.Timeout, "timeout", 10, "Powershell connector timeout")
+	fs.Uint32Var(&c.Timeout, "timeout", 10, "Powershell connector timeout in seconds")
 }
 
 // ParseConfigFromFlags to be called to parse CLI arguments and return the built Config struct.

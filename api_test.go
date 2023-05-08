@@ -3,7 +3,9 @@ package main
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 )
 
 type ApiTest struct {
@@ -52,5 +54,32 @@ func TestApiCmd(t *testing.T) {
 				t.Error("\nActual: ", actual.CheckResult, "\nExpected: ", test.expected.CheckResult)
 			}
 		})
+	}
+}
+
+func TestApiTimeout(t *testing.T) {
+	api := RestAPI{}
+
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Wait for the context timeout to kick in
+		time.Sleep(3 * time.Second)
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+	api.URL = srv.URL
+
+	args := make(map[string]interface{})
+
+	_, err := api.ExecuteCheck("command", args, 1)
+
+	if err == nil {
+		t.Error("Expected error got nil")
+	}
+
+	actual := err.Error()
+	expected := "timeout during HTTP request"
+
+	if !strings.Contains(actual, expected) {
+		t.Error("\nActual: ", actual, "\nExpected: ", expected)
 	}
 }
