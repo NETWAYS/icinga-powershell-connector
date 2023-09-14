@@ -3,9 +3,8 @@ package main
 import (
 	"crypto/x509"
 	"encoding/json"
+	"log/slog"
 	"os"
-
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -27,7 +26,7 @@ func LoadIcingaCACert(path string) *x509.CertPool {
 	// Load contents
 	data, err := os.ReadFile(path)
 	if err != nil {
-		log.WithError(err).WithField("path", path).Debug("could not read Icinga CA certificate")
+		slog.Error("could not read Icinga CA certificate", "path", path)
 
 		return nil
 	}
@@ -35,7 +34,7 @@ func LoadIcingaCACert(path string) *x509.CertPool {
 	// Build pool
 	pool := x509.NewCertPool()
 	if !pool.AppendCertsFromPEM(data) {
-		log.WithField("path", path).Warning("could not append any CA certificates to pool")
+		slog.Error("could not append any CA certificates to pool", "path", path)
 	}
 
 	return pool
@@ -55,7 +54,8 @@ func LoadIcingaVariables(path string) (vars map[string]string) {
 
 	fh, err := os.Open(path)
 	if err != nil {
-		log.WithError(err).WithField("path", path).Debug("could not read vars file")
+		slog.Error("could not read vars file", "path", path)
+
 		return nil
 	}
 

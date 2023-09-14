@@ -7,16 +7,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type RestAPI struct {
 	URL    string
 	Client *http.Client
+	Logger *slog.Logger
 }
 
 func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, timeout uint32) (*APICheckResult, error) { //nolint:lll
@@ -33,10 +33,7 @@ func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, 
 	// Build request
 	requestURL := a.URL + "/v1/checker?command=" + url.QueryEscape(command)
 
-	log.WithFields(log.Fields{
-		"body": string(body),
-		"url":  requestURL,
-	}).Debug("sending request")
+	a.Logger.Debug("sending request", "body", string(body), "url", requestURL)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestURL, bytes.NewReader(body))
 	if err != nil {
@@ -65,7 +62,7 @@ func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, 
 		return nil, fmt.Errorf("could not read result: %w", err)
 	}
 
-	log.WithField("body", string(resultBody)).Debug("received response")
+	a.Logger.Debug("received response", "body", string(resultBody))
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("API request not successful code=%d: %s", resp.StatusCode, string(resultBody))
