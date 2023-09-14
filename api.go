@@ -31,14 +31,14 @@ func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, 
 	defer cancel()
 
 	// Build request
-	requestUrl := a.URL + "/v1/checker?command=" + url.QueryEscape(command)
+	requestURL := a.URL + "/v1/checker?command=" + url.QueryEscape(command)
 
 	log.WithFields(log.Fields{
 		"body": string(body),
-		"url":  requestUrl,
+		"url":  requestURL,
 	}).Debug("sending request")
 
-	req, err := http.NewRequestWithContext(ctx, "POST", requestUrl, bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, requestURL, bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("could not build request: %w", err)
 	}
@@ -53,6 +53,7 @@ func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, 
 		if errors.Is(err, context.DeadlineExceeded) {
 			return nil, fmt.Errorf("timeout during HTTP request: %w", err)
 		}
+
 		return nil, fmt.Errorf("executing API request failed: %w", err)
 	}
 
@@ -66,7 +67,7 @@ func (a RestAPI) ExecuteCheck(command string, arguments map[string]interface{}, 
 
 	log.WithField("body", string(resultBody)).Debug("received response")
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("API request not successful code=%d: %s", resp.StatusCode, string(resultBody))
 	}
 

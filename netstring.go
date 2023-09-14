@@ -8,7 +8,6 @@ import (
 
 const (
 	Separator = ':'
-	// DataEnd   = ','
 )
 
 func ParseNetstring(r io.Reader) ([]byte, error) {
@@ -18,7 +17,7 @@ func ParseNetstring(r io.Reader) ([]byte, error) {
 		digit  int
 	)
 
-	// Read length from reader
+	// Read length from reader.
 	for {
 		_, err := r.Read(char)
 		if err != nil {
@@ -33,7 +32,7 @@ func ParseNetstring(r io.Reader) ([]byte, error) {
 		b := char[0]
 
 		if b == 10 /* \n */ || b == 13 /* \r */ {
-			// ignore line feeds in length
+			// ignore line feeds in length.
 			continue
 		} else if b == Separator {
 			break
@@ -47,7 +46,7 @@ func ParseNetstring(r io.Reader) ([]byte, error) {
 		length = length*10 + digit
 	}
 
-	// Read netstring content
+	// Read netstring content.
 	data := make([]byte, length)
 
 	_, err := r.Read(data)
@@ -55,7 +54,7 @@ func ParseNetstring(r io.Reader) ([]byte, error) {
 		return nil, fmt.Errorf("failed reading netstring content: %w", err)
 	}
 
-	// Read data end char and ignore possible EOF
+	// Read data end char and ignore possible EOF.
 	_, _ = r.Read(char)
 
 	return data, nil

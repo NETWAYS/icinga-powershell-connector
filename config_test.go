@@ -1,10 +1,11 @@
 package main
 
 import (
-	flag "github.com/spf13/pflag"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	flag "github.com/spf13/pflag"
+	"github.com/stretchr/testify/assert"
 )
 
 func quietTest() func() {

@@ -16,19 +16,19 @@ const (
 )
 
 type Config struct {
-	Timeout      uint32
 	API          string
 	Command      string
-	Arguments    map[string]interface{}
 	CertName     string
 	CAFile       string
+	Arguments    map[string]interface{}
+	Timeout      uint32
 	Insecure     bool
 	Debug        bool
 	PrintVersion bool
 }
 
 var (
-	// ErrVersionRequested returned when --version flag is set
+	// ErrVersionRequested returned when --version flag is set.
 	ErrVersionRequested = errors.New("version was requested by a flag")
 
 	// ErrNoCommand is returned when no PowerShell command could be parsed from flags.
