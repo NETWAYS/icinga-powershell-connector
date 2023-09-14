@@ -4,7 +4,8 @@ import (
 	"strings"
 )
 
-// GetPowershellArgs returns remaining args and parse them as if we were powershell.exe
+// GetPowershellArgs returns remaining args and parse them as if we were powershell.exe.
+// nolint:gocognit
 func GetPowershellArgs(args []string) (command string, arguments map[string]interface{}) {
 	arguments = map[string]interface{}{}
 	l := len(args)
@@ -59,6 +60,7 @@ func GetPowershellArgs(args []string) (command string, arguments map[string]inte
 	return
 }
 
+// nolint: gocritic
 func BuildPowershellType(value string) interface{} {
 	if strings.EqualFold(value, `$null`) {
 		return nil
@@ -89,7 +91,7 @@ func BuildPowershellType(value string) interface{} {
 //	@('abc') -> []string{"abc"}
 //	@('abc','def') -> []string{"abc","def"}
 //
-// nolint:funlen
+// nolint: gocognit
 func ConvertPowershellArray(value string) []string {
 	if value == "@()" || len(value) == 0 {
 		return []string{}
@@ -101,44 +103,44 @@ func ConvertPowershellArray(value string) []string {
 	}
 
 	// Am I inside of a string
-	inside_string := false
+	insideString := false
 
 	// Should the current character be escaped
-	escaping_mode := false
+	escapingMode := false
 
 	// Which kind of quotes are we using right now? (Could be " or ')
-	quote_mode := ``
+	quoteMode := ``
 	result := []string{}
 
 	// Remember position
 	marker := 0
 
 	for i := range value {
-		if value[i] == '"' && !escaping_mode {
-			if inside_string && quote_mode == `"` {
-				inside_string = false
-				quote_mode = ``
+		if value[i] == '"' && !escapingMode {
+			if insideString && quoteMode == `"` {
+				insideString = false
+				quoteMode = ``
 			} else {
-				quote_mode = `"`
-				inside_string = true
+				quoteMode = `"`
+				insideString = true
 			}
 
 			continue
 		}
 
-		if value[i] == '\'' && !escaping_mode {
-			if inside_string && quote_mode == `'` {
-				inside_string = false
-				quote_mode = ``
+		if value[i] == '\'' && !escapingMode {
+			if insideString && quoteMode == `'` {
+				insideString = false
+				quoteMode = ``
 			} else {
-				quote_mode = `'`
-				inside_string = true
+				quoteMode = `'`
+				insideString = true
 			}
 
 			continue
 		}
 
-		if value[i] == ',' && !inside_string {
+		if value[i] == ',' && !insideString {
 			if value[i-1] == ',' {
 				// Two consecutive commas
 				result = append(result, "")
@@ -151,13 +153,13 @@ func ConvertPowershellArray(value string) []string {
 			continue
 		}
 
-		if value[i] == '\\' && !escaping_mode {
-			escaping_mode = true
+		if value[i] == '\\' && !escapingMode {
+			escapingMode = true
 			continue
 		}
 
-		if escaping_mode {
-			escaping_mode = false
+		if escapingMode {
+			escapingMode = false
 			continue
 		}
 	}
@@ -171,13 +173,11 @@ func ConvertPowershellArray(value string) []string {
 }
 
 func unquoteString(s string) string {
-	//fmt.Printf("Unquote string: %s\n", s)
 	if len(s) <= 1 {
 		return s
 	}
 
 	if ((s[0]) == '"' && s[len(s)-1] == '"') || (s[0] == '\'' && s[len(s)-1] == '\'') {
-		//fmt.Printf("Unquote string res: %s\n", s[1:len(s)-1])
 		return s[1 : len(s)-1]
 	}
 
@@ -191,7 +191,6 @@ func unquoteString(s string) string {
 //	 try { Use-Icinga -Minimal; } catch { <# something #> exit 3; };
 //			Exit-IcingaExecutePlugin -Command 'Invoke-IcingaCheckUsedPartitionSpace'
 //	 try { Use-Icinga -Minimal; } catch { <# something #> exit 3; }; Invoke-IcingaCheckUsedPartitionSpace
-//	 Invoke-IcingaCheckUsedPartitionSpace
 func ParsePowershellTryCatch(command string) string {
 	command = strings.TrimSpace(command)
 	// For now just parse the last word, dequote it and use it as command
@@ -200,6 +199,7 @@ func ParsePowershellTryCatch(command string) string {
 	return strings.Trim(parts[len(parts)-1], "'\" \t")
 }
 
+// nolint:gocognit
 func IsPowershellArray(s string) bool {
 	l := len(s)
 	if l <= 2 {
@@ -214,45 +214,45 @@ func IsPowershellArray(s string) bool {
 		return false
 	}
 
-	inside_string := false
-	escaping_mode := false
-	quote_mode := ``
-	found_array_separator := false
+	insideString := false
+	escapingMode := false
+	quoteMode := ``
+	foundArraySeparator := false
 
 	for i := range s {
-		if string(s[i]) == `"` && !escaping_mode {
-			if inside_string && quote_mode == `"` {
-				inside_string = false
-				quote_mode = ``
+		if string(s[i]) == `"` && !escapingMode {
+			if insideString && quoteMode == `"` {
+				insideString = false
+				quoteMode = ``
 			} else {
-				quote_mode = `"`
-				inside_string = true
+				quoteMode = `"`
+				insideString = true
 			}
 
 			continue
 		}
 
-		if string(s[i]) == `'` && !escaping_mode {
-			if inside_string && quote_mode == `'` {
-				inside_string = false
-				quote_mode = ``
+		if string(s[i]) == `'` && !escapingMode {
+			if insideString && quoteMode == `'` {
+				insideString = false
+				quoteMode = ``
 			} else {
-				quote_mode = `'`
-				inside_string = true
+				quoteMode = `'`
+				insideString = true
 			}
 
 			continue
 		}
 
-		if string(s[i]) == `,` && !inside_string {
-			found_array_separator = true
+		if string(s[i]) == `,` && !insideString {
+			foundArraySeparator = true
 		}
 
-		if escaping_mode {
-			escaping_mode = false
+		if escapingMode {
+			escapingMode = false
 			continue
 		}
 	}
 
-	return found_array_separator
+	return foundArraySeparator
 }

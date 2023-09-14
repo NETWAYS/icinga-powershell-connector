@@ -3,10 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/NETWAYS/go-check"
-	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
 )
 
@@ -37,12 +37,25 @@ func main() {
 		check.ExitError(err)
 	}
 
-	if config.Debug {
-		log.SetFormatter(&log.TextFormatter{})
-		log.SetLevel(log.DebugLevel)
+	// Default log options
+	opts := &slog.HandlerOptions{
+		Level: slog.LevelInfo,
 	}
 
-	api := RestAPI{URL: config.API, Client: config.NewClient()}
+	handler := slog.NewTextHandler(os.Stdout, opts)
+
+	if config.Debug {
+		opts.Level = slog.LevelDebug
+	}
+
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
+
+	api := RestAPI{
+		URL:    config.API,
+		Client: config.NewClient(),
+		Logger: logger,
+	}
 
 	result, err := api.ExecuteCheck(config.Command, config.Arguments, config.Timeout)
 	if err != nil {

@@ -41,7 +41,7 @@ func (p *APIPerfdataList) UnmarshalJSON(data []byte) error {
 	var value []string
 
 	// catch empty object and return empty []string
-	if bytes.Compare(data, []byte("{}")) == 0 {
+	if bytes.Equal(data, []byte("{}")) {
 		value = []string{}
 	} else {
 		err := json.Unmarshal(data, &value)

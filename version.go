@@ -4,13 +4,12 @@ import "fmt"
 
 // nolint: gochecknoglobals
 var (
-	// These get filled at build time with the proper vaules
+	// These get filled at build time with the proper vaules.
 	version = "development"
 	commit  = "HEAD"
 	date    = "latest"
 )
 
-//goland:noinspection GoBoolExpressions
 func buildVersion() string {
 	result := version
 

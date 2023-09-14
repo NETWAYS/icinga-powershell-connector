@@ -1,8 +1,10 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -23,7 +25,7 @@ func TestApiCmd(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 				w.Write([]byte(`{"Invoke-IcingaCheckFoo": {"exitcode": 0, "checkresult": "[OK] \"foo\"", "perfdata": ["'foo'=1.00%;;;0;100 "]}}`))
 			})),
-			api: RestAPI{},
+			api: RestAPI{Logger: slog.New(slog.NewTextHandler(os.Stdout, nil))},
 			expected: APICheckResult{
 				ExitCode:    0,
 				CheckResult: "[OK] \"foo\"",
@@ -58,7 +60,13 @@ func TestApiCmd(t *testing.T) {
 }
 
 func TestApiTimeout(t *testing.T) {
-	api := RestAPI{}
+	opts := &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}
+
+	logger := slog.New(slog.NewTextHandler(os.Stdout, opts))
+
+	api := RestAPI{Logger: logger}
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Wait for the context timeout to kick in

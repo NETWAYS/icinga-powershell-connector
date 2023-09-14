@@ -2,8 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAPIPerfdataList_UnmarshalJSON(t *testing.T) {
