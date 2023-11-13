@@ -3,7 +3,7 @@ module github.com/NETWAYS/icinga-powershell-connector
 go 1.21
 
 require (
-	github.com/NETWAYS/go-check v0.6.0
+	github.com/NETWAYS/go-check v0.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
 )
