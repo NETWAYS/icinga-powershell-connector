@@ -1,3 +1,10 @@
+> [!IMPORTANT]
+> *Deprecation notice*
+>
+> Recent versions of the Icinga Powershell Framework and Icinga2 mitigate the performance impact
+> of checks. This helper is therefor not needed anymore and there will be no further development.
+
+
 # icinga-powershell-connector
 
 This is an **experimental** mitigation helper, trying to help with issues of high CPU usage with the [Icinga Powershell Framework] on Windows.
